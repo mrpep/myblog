@@ -11,7 +11,6 @@ title = "Pepino's blog"
 languageCode = "en"
 # language name ["English", "简体中文", "Français", "Polski", ...]
 languageName = "English"
-math=True
 
 [params.home.profile]
   enable = true
@@ -24,7 +23,22 @@ math=True
   disclaimer = ""
 [params.header.title]
   name = "Pepino's blog"
-
+[params.page.math]
+  enable = true
+  # default inline delimiter is $ ... $ and \( ... \)
+  # 默认行内定界符是 $ ... $ 和 \( ... \)
+  inlineLeftDelimiter = ""
+  inlineRightDelimiter = ""
+  # default block delimiter is $$ ... $$, \[ ... \], \begin{equation} ... \end{equation} and some other functions
+  # 默认块定界符是 $$ ... $$, \[ ... \],  \begin{equation} ... \end{equation} 和一些其它的函数
+  blockLeftDelimiter = ""
+  blockRightDelimiter = ""
+  # KaTeX extension copy_tex
+  # KaTeX 插件 copy_tex
+  copyTex = true
+  # KaTeX extension mhchem
+  # KaTeX 插件 mhchem
+  mhchem = true
 # Author config
 [author]
   name = "Leonardo Pepino"
