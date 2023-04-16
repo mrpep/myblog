@@ -11,7 +11,8 @@ title = "Pepino's blog"
 languageCode = "en"
 # language name ["English", "简体中文", "Français", "Polski", ...]
 languageName = "English"
-
+[params]
+  math=True
 [params.home.profile]
   enable = true
   gravatarEmail = ""
