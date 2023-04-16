@@ -5,20 +5,28 @@ enableEmoji = true
 theme = "LoveIt"
 
 # website title
-title = "My New Hugo Site"
+title = "Pepino's blog"
 
 # language code ["en", "zh-CN", "fr", "pl", ...]
 languageCode = "en"
 # language name ["English", "简体中文", "Français", "Polski", ...]
 languageName = "English"
 
-[params]
-  title = "Pepino's blog"
-  description = "Let's talk about neural networks and audio"
-  
+[params.home.profile]
+  enable = true
+  gravatarEmail = ""
+  avatarURL = ""
+  title = ""
+  subtitle = "Let's talk about neural networks and audio"
+  typeit = true
+  social = true
+  disclaimer = ""
+[params.header.title]
+  name = "Pepino's blog"
+
 # Author config
 [author]
-  name = "mrpep"
+  name = "Leonardo Pepino"
   email = ""
   link = ""
 
