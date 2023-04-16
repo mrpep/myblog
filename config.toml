@@ -12,6 +12,10 @@ languageCode = "en"
 # language name ["English", "简体中文", "Français", "Polski", ...]
 languageName = "English"
 
+[params]
+  title = "Pepino's blog"
+  description = "Let's talk about neural networks and audio"
+  
 # Author config
 [author]
   name = "mrpep"
