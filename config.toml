@@ -23,7 +23,7 @@ languageName = "English"
   disclaimer = ""
 [params.header.title]
   name = "Pepino's blog"
-[params.math]
+[params.page.math]
   enable = true
   # default inline delimiter is $ ... $ and \( ... \)
   # 默认行内定界符是 $ ... $ 和 \( ... \)
