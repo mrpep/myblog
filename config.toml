@@ -68,7 +68,7 @@ languageName = "English"
   enable = true
 [params.page.comment.disqus]
   enable = true
-  shortname = ""
+  shortname = "mrpepblog"
 
 # Author config
 [author]
