@@ -64,11 +64,6 @@ languageName = "English"
   Skype = false
   Trello = false
   Mix = false
-[params.page.comment]
-  enable = true
-[params.page.comment.disqus]
-  enable = true
-  shortname = "mrpepblog"
 
 # Author config
 [author]

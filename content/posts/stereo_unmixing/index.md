@@ -6,7 +6,6 @@ date: 2023-04-15T00:33:05-03:00
 draft: false
 author: Leonardo Pepino
 math: true
-comment: true
 ---
 
 #### Stereo and panning
