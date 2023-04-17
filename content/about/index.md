@@ -1,4 +1,5 @@
 ---
+comment: false
 ---
 {{< figure src="images/tilcara.jpg" title="Me in Tilcara (Argentina)" >}}
 
