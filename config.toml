@@ -39,6 +39,33 @@ languageName = "English"
   # KaTeX extension mhchem
   # KaTeX 插件 mhchem
   mhchem = true
+[params.page.share]
+  enable = true
+  Twitter = true
+  Facebook = true
+  Linkedin = true
+  Whatsapp = false
+  Pinterest = false
+  Tumblr = false
+  HackerNews = true
+  Reddit = false
+  VK = false
+  Buffer = false
+  Xing = false
+  Line = false
+  Instapaper = false
+  Pocket = false
+  Flipboard = false
+  Weibo = false
+  Blogger = false
+  Baidu = false
+  Odnoklassniki = false
+  Evernote = false
+  Skype = false
+  Trello = false
+  Mix = false
+[params.page.comment]
+  enable = true
 # Author config
 [author]
   name = "Leonardo Pepino"
