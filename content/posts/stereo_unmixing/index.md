@@ -8,7 +8,7 @@ author: Leonardo Pepino
 math: true
 ---
 
-#### Stereo and panning
+### Stereo and panning
 
 Stereophonic sound (stereo) is a method of sound reproduction where 2 independent channels
 are used to recreate the multi-directional aspect of sound. If we want a sound to feel placed on the left of the listener,
@@ -32,7 +32,7 @@ In this case if {{< raw >}}\(\alpha=0\){{< /raw >}}, then the source will be har
 {{< raw >}}\(\alpha=1\){{< /raw >}}, then the source will be hard panned to the left. If {{< raw >}}\(\alpha=0.5\){{< /raw >}}, then
 the source will be panned to the center and will be equally loud for the left and right channels.
 
-#### Mid-side processing
+### Mid-side processing
 
 Let's discuss a first approach commonly used to remove vocals from a stereo song. Let's suppose the vocals are panned to the center (which is a common practice), so
 {{< raw >}}\(\alpha=0.5\){{< /raw >}} and if we do L - R we get:
@@ -82,7 +82,7 @@ We can try the approaches discussed above and the results are these:
 So it seems the mid-side decomposition is not useful in this case as the vocals are not panned to the center.
 Let's try something a bit more sophisticated.
 
-#### "Unpanning" in the time-frequency domain
+### "Unpanning" in the time-frequency domain
 
 Suppose now that we have the L and R tracks, and we want to find the alpha of a source from them.
 If we divide L by R we get:
