@@ -1,0 +1,23 @@
+FSD50K_PATH = '/datasets/fsd50k'
+
+execute_pipeline:
+    tasks = [@set_seed,
+             @load_dataset,
+             @split_dataset,
+             @extract_features,
+             @fit_model]
+
+set_seed.seed = 42
+load_dataset:
+    dataset = 'fsd50k'
+    dataset_path = %FSD50K_PATH
+split_dataset:
+    type = 'train_val_test'
+    proportion = [70,10,20]
+    mode = 'random'
+extract_features:
+    type = 'melspectrogram'
+fit_model:
+    model = @Resnet()
+Resnet:
+    n_layers = 10
