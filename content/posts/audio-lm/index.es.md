@@ -150,37 +150,31 @@ def unapply_delay_pattern(codes):
 
 Puede verse que este approach solo agrega {{< raw >}}\(Q-1\){{< /raw >}} elementos a la secuencia original (en este caso 7).
 
-## Turning GPT2 into an audio generator
+## Adaptando GPT2 a audio
 
-GPT2 (Radford et al., 2019) is the predecessor of GPT3, and it's actually a lot smaller so it can fit in a consumer-grade GPU. It's basically a transformer with the causal attention mask that allows us to use it for language modelling.
-Using it in Python is very easy, thanks to HuggingFace transformers:
+GPT2 (Radford et al., 2019) es el predecesor de GPT3, y es lo suficientemente más pequeño como para entrar en una GPU casera. Basicamente es un transformer con la máscara de atención causal que le permite realizar modelado de lenguaje. Gracias a HuggingFace transformers es muy fácil crear el modelo en Python:
+
 ```python
 from transformers import GPT2Model
 
 gpt = GPT2Model.from_pretrained('gpt2')
 ```
 
-### Adapting GPT2 to our inputs
-We will have to make some modifications to this model to make it work with our inputs:
-- The model has to predict as many outputs per timestep as quantizers. Each quantizer can have 1024 different values, and also can be empty because of the delay pattern.
-This means 1025 possible classes for each quantizer. We can make a linear output classifier with 1025*8 neurons and then reshape it as a tensor of probabilities with shape {{< raw >}}\((batch\_size, 8, 1025)\){{< /raw >}}.
-- The inputs to GPT2 can be discrete (corresponding to the units defined by its pretrained tokenizer), or continuous.
-When the input are discrete tokens, a lookup table is learned by the model to turn each token into a continuous vector.
-In our case it's a bit more complicated as we have 8 discrete tokens per timestep. What we do is to learn a lookup table with 8*1025 possible values and map each quantizer value.
-Then, the 8 retrieved vectors are summed and used as the input to GPT2.
+### Adaptando GPT2 a nuestras entradas
 
-### Prompting with EnCodecMAE
-Also, we want to have some control over the generated audio at inference time. One way to achieve this is by prepending a prompt to the input tokens.
-The prompt could be a sequence of words describing the audio, an image, another audio, etc...
-I've been working in ways to represent audios recently, and proposed [EnCodecMAE](https://github.com/habla-liaa/encodecmae) (Pepino, Riera & Ferrer, 2023), so I'll use these audio vectors as prompt.
-EnCodecMAE is a general audio representation model, which is trained in a similar way to BERT. It was trained with a mixture of speech, music and general audio datasets. The discrete targets to reconstruct
-from the masked inputs were the EnCodec tokens of the unmasked audio.
+Tenemos que hacer algunas modificaciones a GPT2 para hacer que funcione con nuestras entradas:
+- El modelo debe predecir tantas salidas por instante de tiempo como cuantizadores usemos. Cada cuantizador toma 1024 posibles valores o ninguno, debido a que en el delay pattern puede estar vacío al comienzo o final. Esto significa que para cada cuantizador tenemos 1025 posibles clases. Podemos utilizar una capa de clasificación con 1025*8 neuronas y luego hacer un reshape a {{< raw >}}\((batch\_size, 8, 1025)\){{< /raw >}}.
+- Las entradas que toma GPT2 en la librería transformers pueden ser discretas (correspondientes a las unidades definidas por el tokenizador preentrenado), o continuas. Cuando las entradas son discretas, se transforman en continuas mediante un lookup table aprendido por el modelo que mapea cada índice discreto a un vector continuo. En nuestro caso es un poco más complicado ya que por cada instante de tiempo tenemos 8 tokens discretos. Lo que hacemos es aprender un lookup table con 8*1025 códigos y mapear los valores de cada cuantizador. De esta forma, por cada instante de tiempo obtenemos 8 vectores que luego sumamos y usamos como entradas a GPT2.
+
+### Prompting con EnCodecMAE
+
+Además de generar audios, queremos tener cierto control sobre el contenido que se genere. Una manera de lograrlo es colocando un prompt al comienzo de la secuencia de entrada. El prompt puede ser una secuencia de palabras describiendo al audio, una imagen, otro audio, etc... Recientemente estuve trabajando en maneras de representar audios y propuse [EnCodecMAE](https://github.com/habla-liaa/encodecmae) (Pepino, Riera & Ferrer, 2023). Por lo tanto, experimentaremos con prompts obtenidos de audios utilizando este modelo. EnCodecMAE es un modelo que permite extraer representaciones o atributos de audios. Está entrenado de forma similar a BERT con una mezcla de datasets de habla, música y audio general. Los targets discretos a reconstruir a partir de las entradas enmascaradas son los tokens de EnCodec del audio sin enmascarar.
 
 {{< figure src="images/encodecmae2.png" title="EnCodecMAE architecture. From (Pepino, Riera & Ferrer, 2023)" >}}
 
-### Putting everything together
+### Ensamblando todo
 
-Now, we can make a Pytorch Lightning module to encapsulate everything in a class:
+Ahora, podemos escribir un módulo de Pytorch Lightning que encapsule todo:
 ```python
 import pytorch_lightning as pl
 
@@ -253,35 +247,28 @@ class EnCodecGPT(pl.LightningModule):
 
 ```
 
-The full code for training can be found [here](https://github.com/mrpep/encodecgpt).
+El código completo de entrenamiento se puede encontrar [acá](https://github.com/mrpep/encodecgpt).
 
-## Decoding audio
-For the initial experiments, I trained the language model on [NSynth](https://magenta.tensorflow.org/nsynth), which is a
-dataset with many synth samples spanning different music instruments and notes. All the samples are 4 seconds long and quite standarized. This makes it an ideal
-dataset for first toy experiments.
+## Decodeando sonidos
 
-### Autoregressive sampling
-Once the model is trained, we want to generate audios with it. To sample from language models we have to do what is called autoregressive sampling.
-- First, the prompt is fed to GPT2. An output is generated: this is the first sample generated by our model.
-- We feed the prompt and the first sample generated by GPT2 and get the second sample.
-- We keep repeating this process as long as we want, or until a special token (end of audio) is returned by the model. For this experiment we didn't use an end of audio token as
-all the samples are 4 seconds long, so it is expected that after 4 seconds the model will return silence.
+Para los experimentos iniciales entrené GPT2 con [NSynth](https://magenta.tensorflow.org/nsynth) que es un dataset con muchos samples de sintetizadores abarcando diferentes instrumentos musicales y notas. Todas las instancias duran 4 segundos y están bastante estandarizadas. Esto hace que sea un dataset ideal para realizar primeras pruebas de juguete.
 
-A nice thing about HuggingFace GPT2 implementation is that it allows key-value caching. This means that we don't need to generate all the intermediate outputs and compute attention with all the queries all the time during inference,
-as intermediate results are cached at each autoregressive sampling iteration. This saves a lot of computations reducing the time required to generate the sequences.
-This is not a minor detail as autoregressive sampling is expensive because it cannot be parallelized.
+### Muestreo autoregresivo
+Una vez que el modelo está entrenado, queremos generar audios con el. Para muestrear de modelos de lenguaje debemos realizar autoregresión.
+- Primero, el prompt se manda a GPT2 y se genera una salida: esta es la primer muestra generada por nuestro modelo.
+- Luego mandamos el prompt y la primer muestra generada a GPT2 y nos genera la salida anterior y una segunda muestra generada.
+- Repetimos este proceso todo lo que querramos o hasta que se devuelva un token especial que indique el final de la secuencia. Para este experimento no usaremos tokens especiales ya que todos los audios de entrenamiento duran 4 segundos y se espera que el modelo aprenda a devolver silencio pasados esos 4 segundos de generación.
 
-### Different flavors of sampling
-One very important detail to discuss is how to pass from probability outputs to an actual output generated by the language model. There are many approaches, and those are 
-discussed in more depth [here](https://huggingface.co/blog/how-to-generate). Some options are:
-- **Greedy Search**: The output is the token with highest probability (argmax).
-- **Sampling**: The output is picked randomly following the distribution returned by the model. By dividing the logits by a scalar called **temperature**, if we make it lower than 1
-we can make the distribution sharper (give more probability to the most probable tokens) or if we make it higher than 1 the distribution gets more flat. In the extreme, a temperature tending to 0 will be equivalent to greedy search,
-while a temperature tending to infinity will be like sampling from a uniform distribution. Temperature allows us to play with the generations, making them more diverse/random (higher temperature) or more stable (lower temperatures).
-Sometimes, the generations might get stuck in loops and increasing temperature can be a solution.
-- **Top-k Sampling**: Before sampling, we can choose the k tokens with highest probability and redistribute the mass probability among them.
+Algo lindo de la implementación de GPT2 en HuggingFace es que permite cachear los key-values. Esto significa que no necesitamos generar todas las salidas intermedias y calcular la atención completa en cada paso de generación, sino que podemos cachear estos resultados intermedios y calcular solo sobre la muestra nueva. Esto reduce mucho el costo computacional, el cual es elevado ya que este tipo de muestreo no se puede paralelizar.
 
-In the following Python snippet we will use temperature sampling:
+### Distintos sabores de muestreo
+Un aspecto importante que queda discutir es cómo pasar de probabilidades que devuelve el modelo a una salida que indique los tokens de cada cuantizador. Hay muchas maneras de hacer esto y se discuten en profundidad [acá](https://huggingface.co/blog/how-to-generate). Algunos enfoques son:
+
+- **Greedy Search**: la salida en cada instante de tiempo es el token con mayor probabilidad (argmax).
+- **Sampling**: la salida se elige aleatoriamente siguiendo la distribución que devuelve el modelo. Si dividimos los logits por un escalar llamado **temperatura**, podemos controlar la forma de esta distribución. Una temperatura baja hará que los tokens más probables concentren más probabilidad, y al tender a cero tenderá a greedy search. Una temperatura alta hará que las probabilidades sean más uniformes, y al tender a infinito la distribución tenderá a uniforme. Esto permite controlar los resultados generados, haciéndolos más diversos (temperatura alta) o más estables (temperatura baja).
+- **Top-k sampling**: antes de muestrear, podemos escoger los k tokens con mayor probabilidad y redistribuir la probabilidad total entre ellos.
+
+En el siguiente código de Python implementamos temperature sampling:
 
 ```python
 def generate(prompt_filename, encodecmae, lm_model, temperature=1.0, generation_steps=300):
@@ -309,9 +296,9 @@ def generate(prompt_filename, encodecmae, lm_model, temperature=1.0, generation_
     return audio
 ```
 
-### The effect of temperature
+### El efecto de la temperatura
 
-Some examples of what happens when we move the temperature. This example is not in the training set of the model.
+Algunos ejemplos de qué ocurre cuando cambiamos la temperatura. El prompt no estaba en el conjunto de entrenamiento.
 
 {{< music url="audio/t_prompt.wav" name="Prompt" artist="Unknown">}}
 {{< music url="audio/t_001.wav" name="Temperature=0.01" artist="Unknown">}}
@@ -322,13 +309,11 @@ Some examples of what happens when we move the temperature. This example is not 
 {{< music url="audio/t15.wav" name="Temperature=1.5" artist="Unknown">}}
 {{< music url="audio/t20.wav" name="Temperature=2.0" artist="Unknown">}}
 
-We can hear that the generated samples resemble the prompt. However, when the temperature is too low (0.01 and 0.1), artifacts resulting
-from outputs looping between tokens can be heard. This signals us that greedy search might be a bad idea. Increasing temperature leads to more organic results,
-however more noise is also added. When the temperature is too high (>1.0), the generated samples start to sound random and very different from the prompt.
+Podemos escuchar que el audio generado se parece al prompt. Sin embargo, cuando la temperatura es muy baja (0.01 and 0.1), aparecen artefactos debido a que las salidas se quedan loopeando entre tokens. Esto nos da la idea de que greedy search puede no ser la mejor solución. Aumentar la temperatura genera resultados más orgánicos, sin embargo también se añade ruido y aleatoriedad en la generación. Cuando la temperatura es demasiada alta, los audios comenzarán a sonar completamente aleatorios y muy distintos del prompt.
 
-### Non NSynth sounds
+### Sonidos No NSynth
 
-What happens if we use as prompt something that is not a synth sound? Let's find out:
+¿Qué ocurre si utilizamos como prompt sonidos que no son de sintetizador?
 
 #### Prompt 1
 {{< music url="audio/drill_prompt.wav" name="Drill prompt" artist="Unknown">}}
@@ -337,34 +322,33 @@ What happens if we use as prompt something that is not a synth sound? Let's find
 #### Prompt 2
 {{< music url="audio/prompt3.wav" name="Prompt 2" artist="Unknown">}}
 
-If we generate multiple times, we will get different results because of the random sampling. Listen to these 2 different outcomes:
+Si repetimos la generación múltiples veces, cada una dará un resultado distinto debido al muestreo aleatorio:
+
 {{< music url="audio/gen3_1.wav" name="Generated with T=0.7" artist="Unknown">}}
 {{< music url="audio/gen3_2.wav" name="Generated with T=0.7" artist="Unknown">}}
 
 #### Prompt 3
 {{< music url="audio/prompt4.wav" name="Prompt 3" artist="Unknown">}}
 
-EnCodecMAE seems to be capturing the periodicities of the prompt, in spite of the mean pooling over time:
+EnCodecMAE parece estar capturando las periodicidades del prompt a pesar de que se realiza un promedio en el tiempo para obtener el embedding.
+
 {{< music url="audio/gen4_1.wav" name="Generated with T=0.7" artist="Unknown">}}
 {{< music url="audio/gen4_2.wav" name="Generated with T=0.7" artist="Unknown">}}
 
 #### MooSynth
 {{< music url="audio/prompt5.wav" name="Prompt 3" artist="Unknown">}}
 
-We can turn a Moooo into jurassic sounds:
+Podemos transformar un Muuu en sonidos típicos del período jurásico:
 {{< music url="audio/gen5_1.wav" name="Generated with T=0.7" artist="Unknown">}}
 {{< music url="audio/gen5_2.wav" name="Generated with T=0.7" artist="Unknown">}}
 {{< music url="audio/gen5_3.wav" name="Generated with T=0.7" artist="Unknown">}}
 
-### Interpolation
-I have also experimented interpolating 2 prompts. There are some problems if we want to do continuous interpolation:
-- When the input is around 3 seconds long, because of NSynth samples, the generated outputs will start to fade out.
-This can be partially fixed by generating until some point, let's say 2 seconds, and then leaving the sequence length fixed and
-performing a First In First Out strategy.
-- Also, when interpolating, the prompt is changing faster than the previous predicted tokens. This produces a mismatch; the first generated samples
-corresponded to a prompt different from the present one.
+### Interpolaciones
+También experimenté interpolando 2 prompts. Hay algunos problemas si queremos hacer interpolaciones continuas:
+- Cuando se hayan generado aproximadamente 3 segundos de audio, debido a los datos de NSynth, las salidas comenzarán a silenciarse. Esto se puede arreglar aproximadamente utilizando un buffer de salida con longitud fija menor a 3 segundos. Por ejemplo, generamos 2 segundos y luego seguimos generando pero sin agrandar el largo de la secuencia de entrada, sino que quitando de la secuencia las muestras más viejas y añadiendo las nuevas.
+- También, al interpolar, el prompt cambia más rápido que los tokens generados previamente. Esto produce un mismatch; las primeras muestras generadas corresponden a un prompt distinto al actual.
 
-In the examples below, instead of doing continuous interpolation, I generated 15 audios going from the Prompt 1 to the 2 in a linear interpolation, and then I concatenated them.
+En los siguientes ejemplos, en lugar de hacer una interpolación continua, generé 15 audios yendo del prompt 1 al 2 mediante una interpolación lineal, y luego los concatené en un único audio.
 
 #### Example 1
 {{< music url="audio/interp2_p1.wav" name="Prompt 1 (Mridangam)" artist="Unknown">}}
@@ -376,7 +360,7 @@ In the examples below, instead of doing continuous interpolation, I generated 15
 {{< music url="audio/interp3_p2.wav" name="Prompt 2 (NSynth brass)" artist="Unknown">}}
 {{< music url="audio/interp3.wav" name="Linear interpolation" artist="Unknown">}}
 
-## References 
+## Referencias
 
 - Copet, J., Kreuk, F., Gat, I., Remez, T., Kant, D., Synnaeve, G., ... & Défossez, A. (2023). Simple and Controllable Music Generation. arXiv preprint arXiv:2306.05284.
 - Défossez, A., Copet, J., Synnaeve, G., & Adi, Y. (2022). High fidelity neural audio compression. arXiv preprint arXiv:2210.13438.
