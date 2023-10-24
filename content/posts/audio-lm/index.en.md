@@ -179,7 +179,7 @@ It can be seen that this approach adds only {{< raw >}}\(Q-1\){{< /raw >}} eleme
 
 ## Turning GPT2 into an audio generator
 
-GPT2 () is the predecessor of GPT3, and it's actually a lot smaller so it can fit in a consumer-grade GPU. It's basically a transformer with the causal attention mask that allows us to use it for language modelling.
+GPT2 (Radford et al., 2019) is the predecessor of GPT3, and it's actually a lot smaller so it can fit in a consumer-grade GPU. It's basically a transformer with the causal attention mask that allows us to use it for language modelling.
 Using it in Python is very easy, thanks to HuggingFace transformers:
 ```python
 from transformers import GPT2Model
@@ -409,4 +409,5 @@ In the examples below, instead of doing continuous interpolation, I generated 15
 - Défossez, A., Copet, J., Synnaeve, G., & Adi, Y. (2022). High fidelity neural audio compression. arXiv preprint arXiv:2210.13438.
 - Oord, A. V. D., Dieleman, S., Zen, H., Simonyan, K., Vinyals, O., Graves, A., ... & Kavukcuoglu, K. (2016). Wavenet: A generative model for raw audio. arXiv preprint arXiv:1609.03499.
 - Pepino, L., Riera, P., Ferrer, L. (2023). EnCodecMAE: Leveraging neural codecs for universal audio representation learning. arXiv preprint arXiv:2309.07391
+- Radford, A., Wu, J., Child, R., Luan, D., Amodei, D., & Sutskever, I. (2019). Language models are unsupervised multitask learners. OpenAI blog, 1(8), 9.
 - Wang, C., Chen, S., Wu, Y., Zhang, Z., Zhou, L., Liu, S., ... & Wei, F. (2023). Neural codec language models are zero-shot text to speech synthesizers. arXiv preprint arXiv:2301.02111.
