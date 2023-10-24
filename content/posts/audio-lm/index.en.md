@@ -70,7 +70,7 @@ One workaround is to learn a more compact representation of audio. We will take 
 uses a deep neural network to compress 1 second of audio into a sequence of only 75 elements.
 
 ### EnCodec
-{{< figure src="images/encodec.png" title="EnCodec architecture (Défossez, Copet, Synnaeve & Adi, 2022)" >}}
+{{< figure src="images/encodec.png" title="EnCodec architecture. From (Défossez, Copet, Synnaeve & Adi, 2022)" >}}
 As it can be seen in the figure, EnCodec has an encoder and a decoder and its objective is to reconstruct the input audio (it's an autoencoder).
 The loss consists of a weighted sum of other losses: a reconstruction loss in the waveform domain {{< raw >}}\(l_t\){{< /raw >}}; in the spectrogram domain {{< raw >}}\(l_s\){{< /raw >}} and an adversarial loss to reduce artifacts.
 The important bit is that the autoencoder has a very restricted bottleneck: the encoder downsamples the waveform from 24kHz to 75Hz (320x). This might seem like a lot of compression but
@@ -119,7 +119,7 @@ These are some audio samples of encoding/decoding the same audio with a differen
 {{< music url="audio/32q.wav" name="Q=32, bitrate=24 Kbps" artist="Unknown">}}
 ### Multi-sequence patterns
 
-{{< figure src="images/codebook_patterns.png" title="Codebook patterns" >}}
+{{< figure src="images/codebook_patterns.png" title="Codebook patterns. From (Copet et al., 2023)" >}}
 So it seems that now we have a way to tokenize audio efficiently, we just encode it using EnCodec and instead of having a very long sequence of 24000 elements per second, we have only 75.
 But there is a problem still, related to the RVQ, as instead of having a single sequence to represent an audio, we have as many sequences as quantizers. In our experiments we are going to use 8 quantizers, so it would be 8 sequences.
 If the sequences were independent, they could be predicted in parallel. In the same way that the model predicts the next word given the previous ones, we could predict the 8 tokens in parallel, given the previous ones. 
@@ -203,7 +203,7 @@ I've been working in ways to represent audios recently, and proposed [EnCodecMAE
 EnCodecMAE is a general audio representation model, which is trained in a similar way to BERT. It was trained with a mixture of speech, music and general audio datasets. The discrete targets to reconstruct
 from the masked inputs were the EnCodec tokens of the unmasked audio.
 
-{{< figure src="images/encodecmae2.png" title="EnCodecMAE architecture (Pepino, Riera & Ferrer, 2023)" >}}
+{{< figure src="images/encodecmae2.png" title="EnCodecMAE architecture. From (Pepino, Riera & Ferrer, 2023)" >}}
 
 ### Putting everything together
 
