@@ -1,5 +1,5 @@
 ---
-title: "Audio generation using Language Models"
+title: "Modelos de lenguaje para generación de audio"
 tags: ["audio","synthesis","encodec","encodecmae","gpt2"]
 date: 2023-10-23
 draft: false
