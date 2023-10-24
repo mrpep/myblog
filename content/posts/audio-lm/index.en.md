@@ -54,7 +54,7 @@ Let's stick with the first example of tokenization and calculate the probability
 
 Each term in the equation tells us the probability of a word given the previous words. If we train a neural network to predict the next word given the previous ones, and we use cross-entropy as loss function, then
 the outputs will correspond to each of the terms in the equation. The important detail is that our models have to be unable to 'see' into the future; if we peek into the future, then the probabilities will no longer be only conditioned in the past elements of the sequence.
-For recurrent neural networks this restriction is inherent to the model as tokens are processed in the sequence order. In the case of transformers, attention is computed between each query and the past key-values, using attention masks.
+For recurrent neural networks this restriction is inherent to the model as tokens are processed in the sequence order. In the case of transformers, attention is computed between each query and only the past key-values by using attention masks.
 Pre-deep learning methods, like n-grams, would assume that the current output only depends on the previous n-1 outputs. Also causal convolutional neural networks, like Wavenet (Oord et al., 2016), can be used as language models, and the receptive field would be the equivalent to the n in n-grams.
 
 ## Audio tokenization
