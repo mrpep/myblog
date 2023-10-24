@@ -295,7 +295,7 @@ Once the model is trained, we want to generate audios with it. To sample from la
 all the samples are 4 seconds long, so it is expected that after 4 seconds the model will return silence.
 
 A nice thing about HuggingFace GPT2 implementation is that it allows key-value caching. This means that we don't need to generate all the intermediate outputs and compute attention with all the queries all the time during inference,
-as intermediate results are cached at each autoregressive sampling iteration. This saves a lot of computatios reducing the time required to generate the sequences.
+as intermediate results are cached at each autoregressive sampling iteration. This saves a lot of computations reducing the time required to generate the sequences.
 This is not a minor detail as autoregressive sampling is expensive because it cannot be parallelized.
 
 ### Different flavors of sampling
@@ -359,7 +359,7 @@ What happens if we use as prompt something that is not a synth sound? Let's find
 
 #### Prompt 1
 {{< music url="audio/drill_prompt.wav" name="Drill prompt" artist="Unknown">}}
-{{< music url="audio/drill_gen.wav" name="Generated with T=0.7" artist="Unknown">}}
+{{< music url="audio/drill_gen_t07.wav" name="Generated with T=0.7" artist="Unknown">}}
 
 #### Prompt 2
 {{< music url="audio/prompt3.wav" name="Prompt 2" artist="Unknown">}}
