@@ -384,24 +384,34 @@ We can turn a Moooo into jurassic sounds:
 {{< music url="audio/gen5_3.wav" name="Generated with T=0.7" artist="Unknown">}}
 
 ### Interpolation
-I have also experimented interpolating 2 prompts. There are some problems if we want to do continuous interpolation:
-- When the input is around 3 seconds long, because of NSynth samples, the generated outputs will start to fade out.
-This can be partially fixed by generating until some point, let's say 2 seconds, and then leaving the sequence length fixed and
-performing a First In First Out strategy.
-- Also, when interpolating, the prompt is changing faster than the previous predicted tokens. This produces a mismatch; the first generated samples
-corresponded to a prompt different from the present one.
-
-In the examples below, instead of doing continuous interpolation, I generated 15 audios going from the Prompt 1 to the 2 in a linear interpolation, and then I concatenated them.
+Then, I did some experiments morphing between 2 sounds (let's call them A and B). The most straightforward way to do it is
+to extract the prompt from A and B, and generate new prompts that are linear combinations of A and B.
+Then, these prompts are used to generate new audios. Let's listen some examples with 15 prompts between A and B concatenated.
 
 #### Example 1
-{{< music url="audio/interp2_p1.wav" name="Prompt 1 (Mridangam)" artist="Unknown">}}
-{{< music url="audio/interp2_p2.wav" name="Prompt 2 (NSynth Bass electronic)" artist="Unknown">}}
+{{< music url="audio/interp2_p1.wav" name="Prompt A (Mridangam)" artist="Unknown">}}
+{{< music url="audio/interp2_p2.wav" name="Prompt B (NSynth Bass electronic)" artist="Unknown">}}
 {{< music url="audio/interp2.wav" name="Linear interpolation" artist="Unknown">}}
 
 #### Example 2
-{{< music url="audio/interp3_p1.wav" name="Prompt 1 (NSynth mallet)" artist="Unknown">}}
-{{< music url="audio/interp3_p2.wav" name="Prompt 2 (NSynth brass)" artist="Unknown">}}
+{{< music url="audio/interp3_p1.wav" name="Prompt A (NSynth mallet)" artist="Unknown">}}
+{{< music url="audio/interp3_p2.wav" name="Prompt B (NSynth brass)" artist="Unknown">}}
 {{< music url="audio/interp3.wav" name="Linear interpolation" artist="Unknown">}}
+
+What if we want a continuous interpolation between 2 prompts. Is it possible? Well, yes it is, although
+it's a bit more complicated because our model was trained with 4 seconds audios only. However, it is
+still possible to do it by creating a buffer with a length a bit shorter than 4 seconds (to avoid the silence
+at the end of NSynth samples). Let's listen some examples of this type of morphing:
+
+#### Example 1
+{{< music url="audio/cont_interp2a.wav" name="Prompt A (NSynth Vocals)" artist="Unknown">}}
+{{< music url="audio/cont_interp2b.wav" name="Prompt B (NSynth String)" artist="Unknown">}}
+{{< music url="audio/cont_interp2.wav" name="Linear interpolation" artist="Unknown">}}
+
+#### Example 2
+{{< music url="audio/cont_interpa.wav" name="Prompt A (NSynth Vocals)" artist="Unknown">}}
+{{< music url="audio/cont_interpb.wav" name="Prompt B (NSynth Bass)" artist="Unknown">}}
+{{< music url="audio/cont_interp1.wav" name="Linear interpolation" artist="Unknown">}}
 
 ## References 
 
