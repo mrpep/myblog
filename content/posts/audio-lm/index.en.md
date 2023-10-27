@@ -283,9 +283,6 @@ class EnCodecGPT(pl.LightningModule):
 The full code for training can be found [here](https://github.com/mrpep/encodecgpt).
 
 ## Decoding audio
-For the initial experiments, I trained the language model on [NSynth](https://magenta.tensorflow.org/nsynth), which is a
-dataset with many synth samples spanning different music instruments and notes. All the samples are 4 seconds long and quite standarized. This makes it an ideal
-dataset for first toy experiments.
 
 ### Autoregressive sampling
 Once the model is trained, we want to generate audios with it. To sample from language models we have to do what is called autoregressive sampling.
@@ -335,6 +332,11 @@ def generate(prompt_filename, encodecmae, lm_model, temperature=1.0, generation_
     audio = audio[0].cpu().detach().numpy()
     return audio
 ```
+## Examples - Music instruments
+
+For the initial experiments, I trained the language model on [NSynth](https://magenta.tensorflow.org/nsynth), which is a
+dataset with many synth samples spanning different music instruments and notes. All the samples are 4 seconds long and quite standarized. This makes it an ideal
+dataset for first toy experiments.
 
 ### The effect of temperature
 
@@ -352,6 +354,36 @@ Some examples of what happens when we move the temperature. This example is not 
 We can hear that the generated samples resemble the prompt. However, when the temperature is too low (0.01 and 0.1), artifacts resulting
 from outputs looping between tokens can be heard. This signals us that greedy search might be a bad idea. Increasing temperature leads to more organic results,
 however more noise is also added. When the temperature is too high (>1.0), the generated samples start to sound random and very different from the prompt.
+
+### Interpolations
+Then, I did some experiments morphing between 2 sounds (let's call them A and B). The most straightforward way to do it is
+to extract the prompt from A and B, and generate new prompts that are linear combinations of A and B.
+Then, these prompts are used to generate new audios. Let's listen some examples with 15 prompts between A and B concatenated.
+
+#### Example 1
+{{< music url="audio/interp2_p1.wav" name="Prompt A (Mridangam)" artist="Unknown">}}
+{{< music url="audio/interp2_p2.wav" name="Prompt B (NSynth Bass electronic)" artist="Unknown">}}
+{{< music url="audio/interp2.wav" name="Linear interpolation" artist="Unknown">}}
+
+#### Example 2
+{{< music url="audio/interp3_p1.wav" name="Prompt A (NSynth mallet)" artist="Unknown">}}
+{{< music url="audio/interp3_p2.wav" name="Prompt B (NSynth brass)" artist="Unknown">}}
+{{< music url="audio/interp3.wav" name="Linear interpolation" artist="Unknown">}}
+
+What if we want a continuous interpolation between 2 prompts. Is it possible? Well, yes it is, although
+it's a bit more complicated because our model was trained with 4 seconds audios only. However, it is
+still possible to do it by creating a buffer with a length a bit shorter than 4 seconds (to avoid the silence
+at the end of NSynth samples). Let's listen some examples of this type of morphing:
+
+#### Example 1
+{{< music url="audio/cont_interp2a.wav" name="Prompt A (NSynth Vocals)" artist="Unknown">}}
+{{< music url="audio/cont_interp2b.wav" name="Prompt B (NSynth String)" artist="Unknown">}}
+{{< music url="audio/cont_interp2.wav" name="Linear interpolation" artist="Unknown">}}
+
+#### Example 2
+{{< music url="audio/cont_interpa.wav" name="Prompt A (NSynth Vocals)" artist="Unknown">}}
+{{< music url="audio/cont_interpb.wav" name="Prompt B (NSynth Bass)" artist="Unknown">}}
+{{< music url="audio/cont_interp1.wav" name="Linear interpolation" artist="Unknown">}}
 
 ### Non NSynth sounds
 
@@ -382,36 +414,6 @@ We can turn a Moooo into jurassic sounds:
 {{< music url="audio/gen5_1.wav" name="Generated with T=0.7" artist="Unknown">}}
 {{< music url="audio/gen5_2.wav" name="Generated with T=0.7" artist="Unknown">}}
 {{< music url="audio/gen5_3.wav" name="Generated with T=0.7" artist="Unknown">}}
-
-### Interpolation
-Then, I did some experiments morphing between 2 sounds (let's call them A and B). The most straightforward way to do it is
-to extract the prompt from A and B, and generate new prompts that are linear combinations of A and B.
-Then, these prompts are used to generate new audios. Let's listen some examples with 15 prompts between A and B concatenated.
-
-#### Example 1
-{{< music url="audio/interp2_p1.wav" name="Prompt A (Mridangam)" artist="Unknown">}}
-{{< music url="audio/interp2_p2.wav" name="Prompt B (NSynth Bass electronic)" artist="Unknown">}}
-{{< music url="audio/interp2.wav" name="Linear interpolation" artist="Unknown">}}
-
-#### Example 2
-{{< music url="audio/interp3_p1.wav" name="Prompt A (NSynth mallet)" artist="Unknown">}}
-{{< music url="audio/interp3_p2.wav" name="Prompt B (NSynth brass)" artist="Unknown">}}
-{{< music url="audio/interp3.wav" name="Linear interpolation" artist="Unknown">}}
-
-What if we want a continuous interpolation between 2 prompts. Is it possible? Well, yes it is, although
-it's a bit more complicated because our model was trained with 4 seconds audios only. However, it is
-still possible to do it by creating a buffer with a length a bit shorter than 4 seconds (to avoid the silence
-at the end of NSynth samples). Let's listen some examples of this type of morphing:
-
-#### Example 1
-{{< music url="audio/cont_interp2a.wav" name="Prompt A (NSynth Vocals)" artist="Unknown">}}
-{{< music url="audio/cont_interp2b.wav" name="Prompt B (NSynth String)" artist="Unknown">}}
-{{< music url="audio/cont_interp2.wav" name="Linear interpolation" artist="Unknown">}}
-
-#### Example 2
-{{< music url="audio/cont_interpa.wav" name="Prompt A (NSynth Vocals)" artist="Unknown">}}
-{{< music url="audio/cont_interpb.wav" name="Prompt B (NSynth Bass)" artist="Unknown">}}
-{{< music url="audio/cont_interp1.wav" name="Linear interpolation" artist="Unknown">}}
 
 ## References 
 
