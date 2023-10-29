@@ -472,7 +472,31 @@ continuously increased it from 0.01 to 2, so we can listen how speech is heating
 {{< music url="audio/100-1001_shorter.wav" name="Short interpolation" artist="Unknown">}}
 {{< music url="audio/100-1001_long.wav" name="Long interpolation" artist="Unknown">}}
 
-#### Out of domain prompts
+### Out of domain prompts
+
+#### Singing example 1
+{{< music url="audio/singing_prompt1.wav" name="Prompt" artist="Unknown">}}
+{{< music url="audio/singing_gen1.wav" name="Generation T=0.7" artist="Unknown">}}
+
+#### Singing example 2
+{{< music url="audio/singing_prompt2.wav" name="Prompt" artist="Unknown">}}
+{{< music url="audio/singing_gen2.wav" name="Generation T=0.7" artist="Unknown">}}
+
+#### Drums
+{{< music url="audio/drums_prompt1.wav" name="Prompt" artist="Unknown">}}
+{{< music url="audio/drums_gen1.wav" name="Generation T=0.7" artist="Unknown">}}
+
+#### Scratch
+{{< music url="audio/scratch_prompt.wav" name="Prompt" artist="Unknown">}}
+{{< music url="audio/scratch_gen.wav" name="Generation T=0.7" artist="Unknown">}}
+
+#### Guitar Riff
+{{< music url="audio/guitar_prompt.wav" name="Prompt" artist="Unknown">}}
+{{< music url="audio/guitar_gen.wav" name="Generation T=0.7" artist="Unknown">}}
+
+#### Moooo
+{{< music url="audio/prompt5.wav" name="Prompt 3" artist="Unknown">}}
+{{< music url="audio/moo_speech_gen.wav" name="Generation T=0.7" artist="Unknown">}}
 
 ## References
 
