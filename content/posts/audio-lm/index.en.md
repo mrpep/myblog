@@ -470,7 +470,7 @@ continuously increased it from 0.01 to 2, so we can listen how speech is heating
 {{< music url="audio/100-1001_p1.wav" name="Prompt 1" artist="Unknown">}}
 {{< music url="audio/100-1001_p2.wav" name="Prompt 2" artist="Unknown">}}
 {{< music url="audio/100-1001_shorter.wav" name="Short interpolation" artist="Unknown">}}
-{{< music url="audio/100-1001_longer.wav" name="Long interpolation" artist="Unknown">}}
+{{< music url="audio/100-1001_long.wav" name="Long interpolation" artist="Unknown">}}
 
 #### Out of domain prompts
 
