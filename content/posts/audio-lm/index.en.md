@@ -458,7 +458,7 @@ continuously increased it from 0.01 to 2, so we can listen how speech is heating
 {{< music url="audio/scarlett_heating.wav" name="Heating from 0.01 to 2" artist="Unknown">}}
 
 
-### Interpolations
+### Speech Interpolations
 
 #### Example 1
 {{< music url="audio/zuckerberg_prompt.wav" name="Prompt 1" artist="Unknown">}}
