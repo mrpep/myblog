@@ -38,7 +38,14 @@ defaultContentLanguage = "en"
       name = "Categories"
       url = "/categories/"
       title = ""
-
+    [[languages.en.menu.main]]
+      weight = 4
+      identifier = "about"
+      pre = ""
+      post = ""
+      name = "About me"
+      url = "/about/"
+      title = ""
   [languages.es]
     weight = 2
     title = ""
@@ -67,6 +74,14 @@ defaultContentLanguage = "en"
       post = ""
       name = "Categorías"
       url = "/categories/"
+      title = ""
+    [[languages.es.menu.main]]
+      weight = 4
+      identifier = "about"
+      pre = ""
+      post = ""
+      name = "Bio"
+      url = "/about/"
       title = ""
     [[languages.es.markup]]
       # Syntax Highlighting (https://gohugo.io/content-management/syntax-highlighting)
