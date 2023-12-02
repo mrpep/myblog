@@ -1,7 +1,7 @@
 ---
 title: "Implementing KMeans in PyTorch and adding some tricks"
 tags: ["machine learning", "kmeans", "clustering", "pytorch"]
-date: 2023-11-25
+date: 2023-12-02
 draft: false
 math: true
 raw: true
