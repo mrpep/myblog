@@ -1,5 +1,5 @@
 ---
-title: "Implementing KMeans in PyTorch and adding some tricks"
+title: "Diving deep into KMeans"
 tags: ["machine learning", "kmeans", "clustering", "pytorch"]
 date: 2023-12-02
 draft: false
@@ -28,7 +28,7 @@ Another drawback of KMeans is that it doesn't work well in datasets with non-glo
 ## Why turning it into a PyTorch Layer?
 
 In the context of deep learning, KMeans can be quite handy to discretize data points. For example, in HuBERT (Hsu et al, 2021) discrete targets
-are created first from MFCCs and then from internal layers by applying KMeans. For representation learning, it can be useful to promote the formation of clusters (Fard et al, 2020).
+are created first from audio vectors (MFCCs) and then from internal layers by applying KMeans. For representation learning, it can be useful to promote the formation of clusters (Fard et al, 2020).
 It would be nice to have a KMeans pytorch layer with the following properties:
 - It can be plugged into any neural network and perform k-means during the training.
 - It can adapt to changing data (online). This is important if we are clustering internal representations from a neural network as they will change during training.
@@ -184,7 +184,7 @@ Not quite yet! Let's see what happens if we run the same algorithm many times:
 
 {{< figure src="images/kmeans-seeds.png" title="Different runs of KMeans over the same dataset. The yellow diamonds are the initial centroids determined by kmeans++, the red crosses are the centroids after 50 iterations." >}}
 
-We found the 'good solution' 9 times out of 10. Well, as I said before, KMeans doesn't guarantee finding the global minimum. Also, kmeans++ is still a random initialization, so we can still sample 2 centroids that are very close each other (this is what happened in the bad solution). What can we do?
+We found the 'good solution' 9 times out of 10. Can you spot the bad one?... It's second row, right column. Well, as I said before, KMeans doesn't guarantee finding the global minimum. Also, kmeans++ is still a random initialization, so we can sample 2 centroids that are very close each other (this is what happened in the bad solution). What can we do?
 
 Well, let's just run the algorithm a few times and then choose the best clustering. How can we measure a good clustering?
 
@@ -212,7 +212,7 @@ def wcv(self, x):
     return cvsum
 ```
 
-The WCV values at initialization and after 50 iterations can be seen in the titles of the previous figure. While the good solutions end up with a WCV of 3781, the bad one ends up with 9691. This hints us that running multiple seeds and choosing the one with less WCV is a good approach to avoid bad solutions. Also notice that WCV always decreases with KMeans algorithm.
+The WCV values at initialization and after 50 iterations can be seen in the titles of the previous figure. While the good solutions end up with a WCV of 3781, the bad one ends up with 9683. This hints us that running multiple seeds and choosing the one with less WCV is a good approach to avoid bad solutions. Also notice that WCV always decreases with KMeans algorithm.
 
 ## References
 Arthur, D., & Vassilvitskii, S. (2007, January). K-means++ the advantages of careful seeding. In Proceedings of the eighteenth annual ACM-SIAM symposium on Discrete algorithms (pp. 1027-1035).
