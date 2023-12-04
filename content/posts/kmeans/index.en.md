@@ -61,14 +61,18 @@ class KMeansOnlineLayer(torch.nn.Module):
         self.register_buffer('codebook',torch.randn(self.k,self.dim))
         self.register_buffer('cluster_size',torch.zeros((self.k,)))
         self.register_buffer('codebook_sum', self.codebook.clone())
-        
-    def closest_codebook_entry(self, data):
-        #Calculate euclidean distances against all centroids (memory efficient).
-        data_norm = torch.tile((data**2).sum(1).view(-1,1),(1,self.k))
-        centroid_norm = torch.tile((self.codebook**2).sum(1).view(-1,1),(1,data.shape[0]))
-        xy = torch.mm(data,self.codebook.T)
-        distances = data_norm + centroid_norm.T - 2.0*xy
+
+    def euclidean_distance(self, x, y):
+        x_norm = torch.tile((x**2).sum(1).view(-1,1),(1,y.shape[0]))
+        y_norm = torch.tile((y**2).sum(1).view(-1,1),(1,x.shape[0]))
+        xy = torch.mm(x,y.T)
+        distances = x_norm + y_norm.T - 2.0*xy
         distances = torch.clamp(distances,0.0,np.inf)
+        return distances
+
+    def closest_codebook_entry(self, data):
+        #Calculate euclidean distances against all centroids.
+        distances = self.euclidean_distance(data, self.codebook)
         #Find the closest centroids for each data point.
         closest_indices = torch.argmin(distances, dim=1)
 
@@ -182,7 +186,7 @@ A lot better!
 
 Not quite yet! Let's see what happens if we run the same algorithm many times:
 
-{{< figure src="images/kmeans-seeds.png" title="Different runs of KMeans over the same dataset. The yellow diamonds are the initial centroids determined by kmeans++, the red crosses are the centroids after 50 iterations." >}}
+{{< figure src="images/kmeans-seeds.png" title="Different runs of KMeans over the same dataset. The red diamonds are the initial centroids determined by kmeans++, the red crosses are the centroids after 50 iterations." >}}
 
 We found the 'good solution' 9 times out of 10. Can you spot the bad one?... It's second row, right column. Well, as I said before, KMeans doesn't guarantee finding the global minimum. Also, kmeans++ is still a random initialization, so we can sample 2 centroids that are very close each other (this is what happened in the bad solution). What can we do?
 
@@ -213,6 +217,9 @@ def wcv(self, x):
 ```
 
 The WCV values at initialization and after 50 iterations can be seen in the titles of the previous figure. While the good solutions end up with a WCV of 3781, the bad one ends up with 9683. This hints us that running multiple seeds and choosing the one with less WCV is a good approach to avoid bad solutions. Also notice that WCV always decreases with KMeans algorithm.
+
+You can find the final code and experiments of this article in [this colab](https://colab.research.google.com/drive/1VSMV87z7jp3JwfuSMGl2BSussvoraTGQ?usp=sharing):
+
 
 ## References
 Arthur, D., & Vassilvitskii, S. (2007, January). K-means++ the advantages of careful seeding. In Proceedings of the eighteenth annual ACM-SIAM symposium on Discrete algorithms (pp. 1027-1035).
