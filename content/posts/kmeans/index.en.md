@@ -218,7 +218,7 @@ def wcv(self, x):
 
 The WCV values at initialization and after 50 iterations can be seen in the titles of the previous figure. While the good solutions end up with a WCV of 3781, the bad one ends up with 9683. This hints us that running multiple seeds and choosing the one with less WCV is a good approach to avoid bad solutions. Also notice that WCV always decreases with KMeans algorithm.
 
-You can find the final code and experiments of this article in [this colab](https://colab.research.google.com/drive/1VSMV87z7jp3JwfuSMGl2BSussvoraTGQ?usp=sharing):
+You can find the final code and experiments of this article in [this colab](https://colab.research.google.com/drive/1VSMV87z7jp3JwfuSMGl2BSussvoraTGQ?usp=sharing)
 
 
 ## References
