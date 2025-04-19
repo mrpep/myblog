@@ -132,3 +132,20 @@ Finally, if your server dies, you don't want to lose all those precious latex fi
 
 Another approach is to have a github repository where the tex files are backuped. For that purpose I created this [script](https://github.com/mrpep/overleaf-git-sync), which is very easy to use. You can check the readme with instructions, but basically all is needed is to create a repository, and then modify the config.json file adding details about the domain you used in the previous step, username, password, and the local path to the repository you created for backup.
 
+### Associate an email
+You might want to invite new users or let them reset their passwords. The manual way to do this is to go to Admin/Manage Users and register the user email. This will generate an invitation link that you can share with the person. Remember to replace localhost with your overleaf domain from Ngrok.
+
+However this can be tedious as you have to manually do this for every new user. A better approach is to associate an email for administration purposes. I will explain the process for gmail accounts:
+
+1) Generate an app password. This is needed as gmail will ask for 2 factor authentication, but we need a password that overleaf can use to access our account. Go [here](https://myaccount.google.com/apppasswords), enter an app name, ie. Overleaf, and then copy the generated password.
+2) Modify these settings in the variables.env file:
+```
+OVERLEAF_EMAIL_FROM_ADDRESS=your-username@gmail.com
+OVERLEAF_EMAIL_SMTP_HOST=smtp.gmail.com
+OVERLEAF_EMAIL_SMTP_PORT=587
+OVERLEAF_EMAIL_SMTP_SECURE=false
+OVERLEAF_EMAIL_SMTP_USER=your-username@gmail.com
+OVERLEAF_EMAIL_SMTP_PASS=the-pass-you-created
+```
+3) Run bin/up again to refresh the instance and we are ready to go!
+
