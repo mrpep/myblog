@@ -84,7 +84,7 @@ Launch again the overleaf container and check that it works.
 
 ### Adding comments and tracking changes
 
-By default the overleaf community edition image doesn't have the comment feature.
+By default the overleaf community edition image doesn't have the comment feature (<span style="color:red">Now it does! although with this method you can add review/track changes functions ;)</span>.).
 Luckily, some smart people made an [extended overleaf](https://github.com/yu-i-i/overleaf-cep/tree/ldap-tc) tackling this issue.
 We can follow the instructions in this [issue](https://github.com/overleaf/overleaf/issues/1193#issuecomment-2256681075) to enable comments.
 
